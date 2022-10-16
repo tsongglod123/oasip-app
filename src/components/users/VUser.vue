@@ -1,10 +1,29 @@
 <script setup>
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/20/solid";
+import { onBeforeMount } from "vue";
 
-const pageNumber =
-  "inline-flex items-center justify-center w-8 h-8 text-sm border rounded shadow-md bg-gray-50 border-gray-100";
-const arrow =
-  "inline-flex items-center justify-center w-8 h-8 py-0 border rounded-md shadow-md bg-gray-50 border-gray-100";
+const USER_URL = import.meta.env.VITE_BASE_URL + "/v2/users";
+
+const css = {
+  pageNumber:
+    "inline-flex items-center justify-center w-8 h-8 text-sm border rounded shadow-md bg-gray-50 border-gray-100",
+  arrow:
+    "inline-flex items-center justify-center w-8 h-8 py-0 border rounded-md shadow-md bg-gray-50 border-gray-100",
+};
+
+// GET
+const getUsers = async () => {
+  const res = await fetch(USER_URL, {
+    method: "GET",
+    headers: {
+      Authorization: localStorage.getItem("accessToken"),
+    },
+  });
+};
+
+onBeforeMount(() => {
+  console.log("onBeforeMount");
+});
 </script>
 
 <template>
@@ -141,7 +160,7 @@ const arrow =
       </div>
     </div>
     <div class="flex justify-center space-x-1 text-gray-800">
-      <button title="previous" type="button" :class="arrow">
+      <button title="previous" type="button" :class="css.arrow">
         <ChevronLeftIcon class="w-4 h-4" />
       </button>
       <button
@@ -150,9 +169,9 @@ const arrow =
       >
         1
       </button>
-      <button type="button" :class="pageNumber">2</button>
-      <button type="button" :class="pageNumber">3</button>
-      <button title="next" type="button" :class="arrow">
+      <button type="button" :class="css.pageNumber">2</button>
+      <button type="button" :class="css.pageNumber">3</button>
+      <button title="next" type="button" :class="css.arrow">
         <ChevronRightIcon class="w-4 h-4" />
       </button>
     </div>
