@@ -1,6 +1,7 @@
 <script setup>
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/20/solid";
-import { onBeforeMount } from "vue";
+import { onBeforeMount, ref } from "vue";
+import TokenService from "@/services/token";
 
 const USER_URL = import.meta.env.VITE_BASE_URL + "/v2/users";
 
@@ -10,19 +11,26 @@ const css = {
   arrow:
     "inline-flex items-center justify-center w-8 h-8 py-0 border rounded-md shadow-md bg-gray-50 border-gray-100",
 };
+const users = ref({});
 
 // GET
 const getUsers = async () => {
   const res = await fetch(USER_URL, {
     method: "GET",
     headers: {
-      Authorization: localStorage.getItem("accessToken"),
+      Authorization: TokenService.getAccessToken(),
     },
   });
+  if (res.status === 200) {
+    users.value = await res.json();
+  } else {
+    const body = await res.json();
+    alert(body.message);
+  }
 };
 
-onBeforeMount(() => {
-  console.log("onBeforeMount");
+onBeforeMount(async () => {
+  await getUsers();
 });
 </script>
 

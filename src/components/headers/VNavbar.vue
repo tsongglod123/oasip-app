@@ -11,6 +11,7 @@ import {
 import { Bars3Icon, XMarkIcon } from "@heroicons/vue/24/outline";
 import { UserIcon } from "@heroicons/vue/24/solid";
 import { inject } from "vue";
+import TokenService from "@/services/token";
 
 const navigation = [
   { name: "Home", link: "home" },
@@ -20,14 +21,10 @@ const navigation = [
   { name: "About", link: "about" },
 ];
 const goTo = inject("router");
-
-const checkLocalStorage =
-  localStorage.getItem("accessToken") &&
-  localStorage.getItem("refreshToken") &&
-  localStorage.getItem("tokenType");
+const checkLocalStorage = TokenService.checkLocalStorage();
 
 const logout = () => {
-  localStorage.clear();
+  TokenService.clearTokens();
   location.replace("/kp3/login");
 };
 </script>
@@ -130,7 +127,7 @@ const logout = () => {
           v-for="item in navigation"
           :key="item.name"
           as="a"
-          @click.left="goTo(item)"
+          @click.left="goTo(item.link)"
           class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium cursor-pointer"
           >{{ item.name }}
         </DisclosureButton>
