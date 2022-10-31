@@ -1,7 +1,11 @@
+import HttpMethod from "@/services/http-method";
+import jwt_decode from "jwt-decode";
+
 class TokenService {
   #TOKEN_TYPE = "tokenType";
   #ACCESS_TOKEN = "accessToken";
   #REFRESH_TOKEN = "refreshToken";
+  #JSON = "application/json";
 
   #getTokenType() {
     return localStorage.getItem(this.#TOKEN_TYPE);
@@ -49,12 +53,14 @@ class TokenService {
    * @returns {object} The payload of decoded token
    */
   #jwtDecode(token) {
-    // 0 = header (algorithm & token type)
-    // 1 = payload (data)
-    // 2 = verify signature
-    let payload = token.split(".")[1];
-    let data = Buffer.from(payload, "base64").toString("ascii");
-    return JSON.parse(data);
+    let payload = "";
+    if (token.startsWith("Bearer ")) {
+      let jwtToken = token.substring(7, token.length);
+      payload = jwt_decode(jwtToken);
+    } else {
+      payload = jwt_decode(token);
+    }
+    return payload;
   }
 
   /**
@@ -67,6 +73,14 @@ class TokenService {
   }
 
   /**
+   * Save the access token to local storage
+   * @param {string} token - The access token
+   */
+  #setAccessToken(token) {
+    localStorage.setItem(this.#ACCESS_TOKEN, token);
+  }
+
+  /**
    * Check if the token is stored in the local storage
    * @returns {boolean} true if token is stored
    */
@@ -76,6 +90,25 @@ class TokenService {
       localStorage.getItem(this.#REFRESH_TOKEN) !== null &&
       localStorage.getItem(this.#TOKEN_TYPE) !== null
     );
+  }
+
+  async refreshToken() {
+    const url = import.meta.env.VITE_BASE_URL + "/v2/auth/token/refresh";
+    const options = {
+      method: HttpMethod.GET,
+      headers: {
+        "Content-Type": this.#JSON,
+        Authorization: this.getRefreshToken(),
+      },
+    };
+    const res = await fetch(url, options);
+    if (res.status === 200) {
+      const data = await res.json();
+      this.#setAccessToken(data.accessToken);
+    } else {
+      const body = await res.json();
+      alert(body.message);
+    }
   }
 }
 
