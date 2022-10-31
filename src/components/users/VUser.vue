@@ -7,6 +7,7 @@ import {
 import { onBeforeMount, ref } from "vue";
 import TokenService from "@/services/token";
 import HttpMethod from "@/services/http-method";
+import VEmptyList from "@/components/VEmptyList.vue";
 
 const USER_URL = import.meta.env.VITE_BASE_URL + "/v2/users";
 
@@ -17,6 +18,7 @@ const css = {
     "inline-flex items-center justify-center w-8 h-8 py-0 border rounded-md shadow-md bg-gray-50 border-gray-100",
 };
 const users = ref({});
+const user = ref({});
 const currentPage = ref(0);
 
 // GET [start page]
@@ -119,7 +121,28 @@ const goToPage = async (page) => {
   }
 };
 
-// PATCH
+// GET [get user by id]
+const getUserById = async (id) => {
+  if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
+    TokenService.clearTokens();
+    location.replace("/kp3/login");
+  } else if (TokenService.isTokenExpired(TokenService.getAccessToken())) {
+    await TokenService.refreshToken();
+  }
+  const options = {
+    method: HttpMethod.GET,
+    headers: {
+      Authorization: TokenService.getAccessToken(),
+    },
+  };
+  const res = await fetch(USER_URL + "/" + id, options);
+  if (res.status === 200) {
+    user.value = await res.json();
+  } else {
+    const body = await res.json();
+    alert(body.message);
+  }
+};
 
 onBeforeMount(async () => {
   await getUsers();
@@ -127,7 +150,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div id="user-list">
+  <div id="user-list" v-show="users.totalElements > 0">
     <div class="container p-2 mx-auto sm:p-4 text-gray-800">
       <h2 class="mb-4 text-2xl font-semibold leading-tight">Users</h2>
       <div class="overflow-x-auto">
@@ -203,6 +226,9 @@ onBeforeMount(async () => {
         <ChevronRightIcon class="w-4 h-4" />
       </button>
     </div>
+  </div>
+  <div v-show="users.totalElements === 0">
+    <VEmptyList />
   </div>
 </template>
 
