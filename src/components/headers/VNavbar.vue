@@ -30,7 +30,7 @@ const logout = () => {
 </script>
 
 <template>
-  <Disclosure as="nav" class="bg-gray-800" v-slot="{ open }">
+  <Disclosure v-slot="{ open }" as="nav" class="bg-gray-800">
     <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
       <div class="relative flex h-16 items-center justify-between">
         <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -54,8 +54,8 @@ const logout = () => {
               <a
                 v-for="item in navigation"
                 :key="item.name"
-                @click.left="goTo(item.link)"
                 class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium cursor-pointer"
+                @click.left="goTo(item.link)"
                 >{{ item.name }}
               </a>
             </div>
@@ -85,33 +85,33 @@ const logout = () => {
               <MenuItems
                 class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
               >
-                <MenuItem v-slot="{ active }" v-if="!checkLocalStorage">
+                <MenuItem v-if="!checkLocalStorage" v-slot="{ active }">
                   <a
-                    @click.left="goTo('login')"
                     :class="[
                       active ? 'bg-gray-100' : '',
                       'block px-4 py-2 text-sm text-gray-700 cursor-pointer',
                     ]"
+                    @click.left="goTo('login')"
                     >Sign in
                   </a>
                 </MenuItem>
-                <MenuItem v-slot="{ active }" v-if="!checkLocalStorage">
+                <MenuItem v-if="!checkLocalStorage" v-slot="{ active }">
                   <a
-                    @click.left="goTo('register')"
                     :class="[
                       active ? 'bg-gray-100' : '',
                       'block px-4 py-2 text-sm text-gray-700 cursor-pointer',
                     ]"
+                    @click.left="goTo('register')"
                     >Sign up
                   </a>
                 </MenuItem>
-                <MenuItem v-slot="{ active }" v-if="checkLocalStorage">
+                <MenuItem v-if="checkLocalStorage" v-slot="{ active }">
                   <a
-                    @click.left="logout"
                     :class="[
                       active ? 'bg-gray-100' : '',
                       'block px-4 py-2 text-sm text-gray-700 cursor-pointer',
                     ]"
+                    @click.left="logout"
                     >Sign out
                   </a>
                 </MenuItem>
@@ -127,8 +127,8 @@ const logout = () => {
           v-for="item in navigation"
           :key="item.name"
           as="a"
-          @click.left="goTo(item.link)"
           class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium cursor-pointer"
+          @click.left="goTo(item.link)"
           >{{ item.name }}
         </DisclosureButton>
       </div>

@@ -178,7 +178,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div id="user-list" v-show="users.totalElements > 0">
+  <div v-show="users.totalElements > 0" id="user-list">
     <div class="container p-2 mx-auto sm:p-4 text-gray-800">
       <h2 class="mb-4 text-2xl font-semibold leading-tight">Users</h2>
       <div class="overflow-x-auto">
@@ -201,21 +201,21 @@ onBeforeMount(async () => {
           </thead>
           <tbody>
             <tr
+              v-for="content in users.content"
+              :key="content.id"
               class="border-b border-opacity-20 border-gray-300 bg-gray-50"
-              v-for="user in users.content"
-              :key="user.id"
             >
               <td class="p-3">
-                <p>{{ user.id }}</p>
+                <p>{{ content.id }}</p>
               </td>
               <td class="p-3">
-                <p>{{ user.userName }}</p>
+                <p>{{ content.userName }}</p>
               </td>
               <td class="p-3">
-                <p>{{ user.userEmail }}</p>
+                <p>{{ content.userEmail }}</p>
               </td>
               <td class="p-3">
-                <p>{{ user.userRoles[0].roleName }}</p>
+                <p>{{ content.userRoles[0].roleName }}</p>
               </td>
               <td class="p-3 text-right">
                 <button type="button">
@@ -237,10 +237,10 @@ onBeforeMount(async () => {
         <ChevronLeftIcon class="w-4 h-4" />
       </button>
       <button
-        type="button"
-        :class="css.pageNumber"
         v-for="page in users.totalPages"
         :key="page"
+        type="button"
+        :class="css.pageNumber"
         @click.left="goToPage(page - 1)"
       >
         {{ page }}

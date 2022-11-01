@@ -70,8 +70,8 @@ const goTo = inject("router");
             <label for="email-address" class="sr-only">Email address</label>
             <input
               id="email-address"
-              type="email"
               v-model="user.userEmail"
+              type="email"
               :maxlength="LENGTH.email"
               class="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
               placeholder="Email address"
@@ -83,8 +83,8 @@ const goTo = inject("router");
             <label for="password" class="sr-only">Password</label>
             <input
               id="password"
-              type="password"
               v-model="user.userPassword"
+              type="password"
               :minlength="LENGTH.password.min"
               :maxlength="LENGTH.password.max"
               class="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
@@ -96,8 +96,8 @@ const goTo = inject("router");
         <div>
           <button
             type="submit"
-            @click.left="login(user)"
             class="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            @click.left="login(user)"
           >
             Sign in
           </button>
@@ -107,8 +107,8 @@ const goTo = inject("router");
         <div class="text-sm">
           New to OASIP?
           <a
-            @click.left="goTo('register')"
             class="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+            @click.left="goTo('register')"
           >
             Create an account
           </a>

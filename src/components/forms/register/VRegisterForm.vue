@@ -101,8 +101,8 @@ const register = async (data) => {
             <label for="username" class="sr-only">Username</label>
             <input
               id="username"
-              type="text"
               v-model="user.userName"
+              type="text"
               :maxlength="LENGTH.username"
               class="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
               placeholder="Username"
@@ -113,8 +113,8 @@ const register = async (data) => {
             <label for="email" class="sr-only">Email address</label>
             <input
               id="email"
-              type="email"
               v-model="user.userEmail"
+              type="email"
               :maxlength="LENGTH.email"
               class="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
               placeholder="Email address"
@@ -126,8 +126,8 @@ const register = async (data) => {
             <label for="password" class="sr-only">Password</label>
             <input
               id="password"
-              type="password"
               v-model="user.userPassword"
+              type="password"
               :minlength="LENGTH.password.min"
               :maxlength="LENGTH.password.max"
               class="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
@@ -141,8 +141,8 @@ const register = async (data) => {
             </label>
             <input
               id="confirm-password"
-              type="password"
               v-model="confirmPwd"
+              type="password"
               :minlength="LENGTH.password.min"
               :maxlength="LENGTH.password.max"
               class="relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
@@ -172,8 +172,8 @@ const register = async (data) => {
         <div>
           <button
             type="submit"
-            @click.left="register(user)"
             class="group relative flex w-full justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            @click.left="register(user)"
           >
             Sign up
           </button>
@@ -183,8 +183,8 @@ const register = async (data) => {
         <div class="text-sm">
           Already have an account?
           <a
-            @click.left="goTo('login')"
             class="font-medium text-indigo-600 hover:text-indigo-500 cursor-pointer"
+            @click.left="goTo('login')"
           >
             Sign in
           </a>
