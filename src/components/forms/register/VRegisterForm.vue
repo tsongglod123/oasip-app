@@ -1,5 +1,6 @@
 <script setup>
 import { ref, inject } from "vue";
+import HttpMethod from "@/services/http-method";
 
 const LENGTH = inject("length");
 const EMAIL_REGEX = inject("emailRegex");
@@ -53,13 +54,14 @@ const clearForm = () => {
 // POST
 const register = async (data) => {
   if (isAllowToSubmit(data)) {
-    const res = await fetch(AUTH_URL + "/register", {
-      method: "POST",
+    const options = {
+      method: HttpMethod.POST,
       headers: {
         "Content-Type": json,
       },
       body: JSON.stringify(data),
-    });
+    };
+    const res = await fetch(AUTH_URL + "/register", options);
     if (res.status === 201) {
       alert("Register successfully!");
       goTo("login");

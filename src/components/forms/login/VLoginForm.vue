@@ -1,5 +1,6 @@
 <script setup>
 import { ref, inject } from "vue";
+import HttpMethod from "@/services/http-method";
 
 const LENGTH = inject("length");
 const EMAIL_REGEX = inject("emailRegex");
@@ -24,13 +25,14 @@ const isAllowToSubmit = (user) => {
 // POST
 const login = async (data) => {
   if (isAllowToSubmit(data)) {
-    const res = await fetch(AUTH_URL + "/login", {
-      method: "POST",
+    const options = {
+      method: HttpMethod.POST,
       headers: {
         "Content-Type": json,
       },
       body: JSON.stringify(data),
-    });
+    };
+    const res = await fetch(AUTH_URL + "/login", options);
     if (res.status === 200) {
       const token = await res.json();
       for (const key in token) localStorage.setItem(key, token[key]);

@@ -4,7 +4,7 @@ import {
   ChevronRightIcon,
   PencilSquareIcon,
 } from "@heroicons/vue/20/solid";
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, inject } from "vue";
 import TokenService from "@/services/token";
 import HttpMethod from "@/services/http-method";
 import VEmptyList from "@/components/VEmptyList.vue";
@@ -20,6 +20,7 @@ const css = {
 const users = ref({});
 const user = ref({});
 const currentPage = ref(0);
+const json = inject("json");
 
 // GET [start page]
 const getUsers = async () => {
@@ -134,6 +135,33 @@ const getUserById = async (id) => {
     headers: {
       Authorization: TokenService.getAccessToken(),
     },
+  };
+  const res = await fetch(USER_URL + "/" + id, options);
+  if (res.status === 200) {
+    user.value = await res.json();
+  } else {
+    const body = await res.json();
+    alert(body.message);
+  }
+};
+
+// PATCH [update user by id]
+const update = async (id, field, value) => {
+  if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
+    TokenService.clearTokens();
+    location.replace("/kp3/login");
+  } else if (TokenService.isTokenExpired(TokenService.getAccessToken())) {
+    await TokenService.refreshToken();
+  }
+  const options = {
+    method: HttpMethod.PATCH,
+    headers: {
+      "Content-Type": json,
+      Authorization: TokenService.getAccessToken(),
+    },
+    body: JSON.stringify({
+      [field]: value,
+    }),
   };
   const res = await fetch(USER_URL + "/" + id, options);
   if (res.status === 200) {
