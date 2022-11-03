@@ -3,9 +3,9 @@ import VEmptyList from "@/components/VEmptyList.vue";
 </script>
 
 <template>
-  <div v-show="0 > 0" id="category-list">
+  <div v-show="0 > 0" id="booking-list">
     <div class="container p-2 mx-auto sm:p-4 text-gray-800">
-      <h2 class="mb-4 text-2xl font-semibold leading-tight">Categories</h2>
+      <h2 class="mb-4 text-2xl font-semibold leading-tight">Events</h2>
       <div class="overflow-x-auto">
         <table class="min-w-full text-xs">
           <colgroup>

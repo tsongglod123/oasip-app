@@ -1,7 +1,11 @@
-<script setup></script>
+<script setup>
+import VEvent from "@/components/events/VEvent.vue";
+</script>
 
 <template>
-  <div>Events</div>
+  <div>
+    <VEvent />
+  </div>
 </template>
 
 <style scoped></style>
