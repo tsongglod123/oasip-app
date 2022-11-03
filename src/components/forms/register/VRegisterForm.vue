@@ -1,6 +1,5 @@
 <script setup>
 import { ref, inject } from "vue";
-import HttpMethod from "@/services/http-method";
 
 const LENGTH = inject("length");
 const EMAIL_REGEX = inject("emailRegex");
@@ -55,7 +54,7 @@ const clearForm = () => {
 const register = async (data) => {
   if (isAllowToSubmit(data)) {
     const options = {
-      method: HttpMethod.POST,
+      method: "POST",
       headers: {
         "Content-Type": json,
       },

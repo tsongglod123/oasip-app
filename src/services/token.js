@@ -1,4 +1,3 @@
-import HttpMethod from "@/services/http-method";
 import jwt_decode from "jwt-decode";
 
 class TokenService {
@@ -95,7 +94,7 @@ class TokenService {
   async refreshToken() {
     const url = import.meta.env.VITE_BASE_URL + "/v2/auth/token/refresh";
     const options = {
-      method: HttpMethod.GET,
+      method: "GET",
       headers: {
         "Content-Type": this.#JSON,
         Authorization: this.getRefreshToken(),

@@ -3,11 +3,12 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   PencilSquareIcon,
+  XCircleIcon,
 } from "@heroicons/vue/20/solid";
 import { onBeforeMount, ref, inject } from "vue";
 import TokenService from "@/services/token";
-import HttpMethod from "@/services/http-method";
 import VEmptyList from "@/components/VEmptyList.vue";
+import VModal from "@/components/users/VModal.vue";
 
 const USER_URL = import.meta.env.VITE_BASE_URL + "/v2/users";
 
@@ -21,6 +22,15 @@ const users = ref({});
 const user = ref({});
 const currentPage = ref(0);
 const json = inject("json");
+const isAuth = ref(false);
+const showModal = ref(false);
+const borderRing = ref("");
+const ring = {
+  normal: "focus:ring-blue-500 focus:border-blue-500",
+  error: "focus:ring-red-500 focus:border-red-500",
+};
+
+const toggleModal = (open) => (showModal.value = !open);
 
 // GET [start page]
 const getUsers = async () => {
@@ -31,7 +41,7 @@ const getUsers = async () => {
     await TokenService.refreshToken();
   }
   const options = {
-    method: HttpMethod.GET,
+    method: "GET",
     headers: {
       Authorization: TokenService.getAccessToken(),
     },
@@ -54,7 +64,7 @@ const nextPage = async () => {
     await TokenService.refreshToken();
   }
   const options = {
-    method: HttpMethod.GET,
+    method: "GET",
     headers: {
       Authorization: TokenService.getAccessToken(),
     },
@@ -81,7 +91,7 @@ const previousPage = async () => {
     await TokenService.refreshToken();
   }
   const options = {
-    method: HttpMethod.GET,
+    method: "GET",
     headers: {
       Authorization: TokenService.getAccessToken(),
     },
@@ -108,7 +118,7 @@ const goToPage = async (page) => {
     await TokenService.refreshToken();
   }
   const options = {
-    method: HttpMethod.GET,
+    method: "GET",
     headers: {
       Authorization: TokenService.getAccessToken(),
     },
@@ -131,7 +141,7 @@ const getUserById = async (id) => {
     await TokenService.refreshToken();
   }
   const options = {
-    method: HttpMethod.GET,
+    method: "GET",
     headers: {
       Authorization: TokenService.getAccessToken(),
     },
@@ -146,7 +156,7 @@ const getUserById = async (id) => {
 };
 
 // PATCH [update user by id]
-const update = async (id, field, value) => {
+const updateUser = async ([id, field, value]) => {
   if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
     TokenService.clearTokens();
     location.replace("/kp3/login");
@@ -154,26 +164,60 @@ const update = async (id, field, value) => {
     await TokenService.refreshToken();
   }
   const options = {
-    method: HttpMethod.PATCH,
+    method: "PATCH",
     headers: {
       "Content-Type": json,
       Authorization: TokenService.getAccessToken(),
     },
     body: JSON.stringify({
-      [field]: value,
+      [field]: value.trim(),
     }),
   };
   const res = await fetch(USER_URL + "/" + id, options);
   if (res.status === 200) {
     user.value = await res.json();
+    users.value.content = users.value.content.map((u) =>
+      u.id === user.value.id ? user.value : u
+    );
+    borderRing.value = ring.normal;
   } else {
-    const body = await res.json();
-    alert(body.message);
+    borderRing.value = ring.error;
+  }
+};
+
+// DELETE [delete user by id]
+const deleteUser = async (id) => {
+  if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
+    TokenService.clearTokens();
+    location.replace("/kp3/login");
+  } else if (TokenService.isTokenExpired(TokenService.getAccessToken())) {
+    await TokenService.refreshToken();
+  }
+  const text = "Are you sure you want to delete this user?";
+  if (confirm(text)) {
+    const options = {
+      method: "DELETE",
+      headers: {
+        Authorization: TokenService.getAccessToken(),
+      },
+    };
+    const res = await fetch(USER_URL + "/" + id, options);
+    if (res.status === 200) {
+      users.value.content = users.value.content.filter((u) => u.id !== id);
+    } else {
+      const body = await res.json();
+      alert(body.message);
+    }
   }
 };
 
 onBeforeMount(async () => {
-  await getUsers();
+  if (!TokenService.checkLocalStorage()) {
+    isAuth.value = true;
+  } else {
+    isAuth.value = false;
+    await getUsers();
+  }
 });
 </script>
 
@@ -215,16 +259,35 @@ onBeforeMount(async () => {
                 <p>{{ content.userEmail }}</p>
               </td>
               <td class="p-3">
-                <p>{{ content.userRoles[0].roleName }}</p>
+                <p>{{ content.role }}</p>
               </td>
               <td class="p-3 text-right">
+                <button type="button" class="mr-2">
+                  <PencilSquareIcon
+                    class="w-4 h-4"
+                    @click.left="
+                      getUserById(content.id);
+                      toggleModal(showModal);
+                    "
+                  />
+                </button>
                 <button type="button">
-                  <PencilSquareIcon class="w-4 h-4" />
+                  <XCircleIcon
+                    class="w-4 h-4 text-red-600"
+                    @click.left="deleteUser(content.id)"
+                  />
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
+        <VModal
+          :user="user"
+          :is-open="showModal"
+          :border="borderRing"
+          @toggle="toggleModal"
+          @update="updateUser"
+        />
       </div>
     </div>
     <div class="flex justify-center space-x-1 text-gray-800">
@@ -255,7 +318,7 @@ onBeforeMount(async () => {
       </button>
     </div>
   </div>
-  <div v-show="users.totalElements === 0">
+  <div v-show="users.totalElements === 0 || isAuth">
     <VEmptyList />
   </div>
 </template>
