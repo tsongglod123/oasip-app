@@ -72,6 +72,15 @@ class TokenService {
   }
 
   /**
+   * Get user's role from the token
+   * @returns {string} The role of the user
+   */
+  getRole() {
+    let payload = this.#jwtDecode(this.getAccessToken());
+    return payload.roles[0];
+  }
+
+  /**
    * Save the access token to local storage
    * @param {string} token - The access token
    */
