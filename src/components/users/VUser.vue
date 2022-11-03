@@ -24,11 +24,6 @@ const currentPage = ref(0);
 const json = inject("json");
 const isAuth = ref(false);
 const showModal = ref(false);
-const borderRing = ref("");
-const ring = {
-  normal: "focus:ring-blue-500 focus:border-blue-500",
-  error: "focus:ring-red-500 focus:border-red-500",
-};
 
 const toggleModal = (open) => (showModal.value = !open);
 
@@ -179,9 +174,9 @@ const updateUser = async ([id, field, value]) => {
     users.value.content = users.value.content.map((u) =>
       u.id === user.value.id ? user.value : u
     );
-    borderRing.value = ring.normal;
   } else {
-    borderRing.value = ring.error;
+    const body = await res.json();
+    alert(body.message);
   }
 };
 
@@ -261,10 +256,10 @@ onBeforeMount(async () => {
               <td class="p-3">
                 <p>{{ content.role }}</p>
               </td>
-              <td class="p-3 text-right">
+              <td class="p-2 text-right">
                 <button type="button" class="mr-2">
                   <PencilSquareIcon
-                    class="w-4 h-4"
+                    class="w-5 h-5"
                     @click.left="
                       getUserById(content.id);
                       toggleModal(showModal);
@@ -273,7 +268,7 @@ onBeforeMount(async () => {
                 </button>
                 <button type="button">
                   <XCircleIcon
-                    class="w-4 h-4 text-red-600"
+                    class="w-5 h-5 text-red-600"
                     @click.left="deleteUser(content.id)"
                   />
                 </button>
@@ -284,7 +279,6 @@ onBeforeMount(async () => {
         <VModal
           :user="user"
           :is-open="showModal"
-          :border="borderRing"
           @toggle="toggleModal"
           @update="updateUser"
         />

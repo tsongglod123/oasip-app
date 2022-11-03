@@ -6,10 +6,10 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/vue";
-import { inject } from "vue";
+import { inject, ref } from "vue";
 
 const emit = defineEmits(["toggle", "update"]);
-defineProps({
+const props = defineProps({
   user: {
     type: Object,
     required: true,
@@ -17,19 +17,50 @@ defineProps({
   isOpen: {
     type: Boolean,
   },
-  border: {
-    type: String,
-    required: true,
-  },
 });
 
 const LENGTH = inject("length");
 const EMAIL_REGEX = inject("emailRegex");
+const css = {
+  save: "inline-flex justify-center rounded-md border border-transparent bg-green-100 px-2 py-1 text-xs font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2",
+  cancel:
+    "inline-flex justify-center rounded-md border border-transparent px-2 py-1 text-xs font-medium text-gray-400 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+  input: {
+    disabled:
+      "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500",
+    enabled:
+      "border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500",
+  },
+};
 
 const roles = ["student", "lecturer", "admin"];
+const isPanelOpen = ref({
+  username: false,
+  email: false,
+});
+const edit = ref({
+  userName: "",
+  userEmail: "",
+});
 
-const closeModal = () => emit("toggle", true);
+const closeModal = () => {
+  for (const field in isPanelOpen.value) {
+    isPanelOpen.value[field] = false;
+  }
+  setDefault("userName");
+  setDefault("userEmail");
+  emit("toggle", true);
+};
+
 const updateUser = (id, field, val) => emit("update", [id, field, val]);
+
+const togglePanel = (field) => {
+  setDefault("userName");
+  setDefault("userEmail");
+  isPanelOpen.value[field] = !isPanelOpen.value[field];
+};
+
+const setDefault = (field) => (edit.value[field] = props.user[field]);
 </script>
 
 <template>
@@ -66,46 +97,106 @@ const updateUser = (id, field, val) => emit("update", [id, field, val]);
                 as="h3"
                 class="text-lg font-medium leading-6 text-gray-900"
               >
-                Edit
+                User Information
               </DialogTitle>
               <div class="mt-2">
                 <div>
                   <label
                     for="username"
                     class="block mb-2 text-sm font-medium text-gray-900"
-                    >Username</label
-                  >
+                    >Username
+                    <button
+                      type="button"
+                      class="text-sm text-blue-500 hover:text-blue-700"
+                      @click.left="togglePanel('username')"
+                    >
+                      edit
+                    </button>
+                  </label>
                   <input
                     id="username"
                     :value="user.userName"
                     type="text"
                     :maxlength="LENGTH.username"
-                    :class="[
-                      'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5',
-                      border,
-                    ]"
-                    required
-                    @input="
-                      updateUser(user.id, 'userName', $event.target.value)
+                    :class="
+                      isPanelOpen.username
+                        ? css.input.enabled
+                        : css.input.disabled
                     "
+                    :disabled="!isPanelOpen.username"
+                    @input="edit.userName = $event.target.value"
                   />
+                  <div
+                    v-show="isPanelOpen.username"
+                    class="mt-1 flex flex-row-reverse"
+                  >
+                    <button
+                      type="button"
+                      :class="css.save"
+                      @click.left="
+                        updateUser(user.id, 'userName', edit.userName);
+                        togglePanel('username');
+                      "
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      :class="css.cancel"
+                      @click.left="togglePanel('username')"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+                <div>
                   <label
                     for="email"
                     class="block mb-2 text-sm font-medium text-gray-900"
-                    >Email</label
-                  >
+                    >Email
+                    <button
+                      type="button"
+                      class="text-sm text-blue-500 hover:text-blue-700"
+                      @click.left="togglePanel('email')"
+                    >
+                      edit
+                    </button>
+                  </label>
                   <input
                     id="email"
                     :value="user.userEmail"
                     type="email"
                     :maxlength="LENGTH.email"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                    :pattern="EMAIL_REGEX"
-                    required
-                    @input="
-                      updateUser(user.id, 'userEmail', $event.target.value)
+                    :class="
+                      isPanelOpen.email ? css.input.enabled : css.input.disabled
                     "
+                    :pattern="EMAIL_REGEX"
+                    :disabled="!isPanelOpen.email"
                   />
+                  <div
+                    v-show="isPanelOpen.email"
+                    class="mt-1 flex flex-row-reverse"
+                  >
+                    <button
+                      type="button"
+                      :class="css.save"
+                      @click.left="
+                        updateUser(user.id, 'userEmail', edit.userEmail);
+                        togglePanel('email');
+                      "
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      :class="css.cancel"
+                      @click.left="togglePanel('email')"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+                <div>
                   <label
                     for="role"
                     class="block mb-2 text-sm font-medium text-gray-900"
@@ -114,7 +205,7 @@ const updateUser = (id, field, val) => emit("update", [id, field, val]);
                   <select
                     id="role"
                     :value="user.role"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    :class="css.input.enabled"
                     required
                     @input="
                       updateUser(user.id, 'userRole', $event.target.value)
@@ -129,6 +220,8 @@ const updateUser = (id, field, val) => emit("update", [id, field, val]);
                       {{ role }}
                     </option>
                   </select>
+                </div>
+                <div>
                   <dl>
                     <div
                       class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
@@ -161,7 +254,7 @@ const updateUser = (id, field, val) => emit("update", [id, field, val]);
                 <button
                   type="button"
                   class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                  @click="closeModal"
+                  @click.left="closeModal"
                 >
                   Close
                 </button>
