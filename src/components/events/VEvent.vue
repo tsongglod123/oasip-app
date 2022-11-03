@@ -1,5 +1,21 @@
 <script setup>
+import TokenService from "@/services/token";
 import VEmptyList from "@/components/VEmptyList.vue";
+import { inject, ref } from "vue";
+
+const EVENT_URL = import.meta.env.VITE_BASE_URL + "/v2/events";
+
+const events = ref([]);
+const event = ref({});
+const json = inject("json");
+const isAuth = ref(false);
+const showModal = ref(false);
+
+const toggleModal = (open) => (showModal.value = !open);
+
+// GET
+// DELETE
+// PATCH
 </script>
 
 <template>
