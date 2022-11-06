@@ -172,6 +172,7 @@ const setDefault = (field) => (edit.value[field] = props.user[field]);
                     "
                     :pattern="EMAIL_REGEX"
                     :disabled="!isPanelOpen.email"
+                    @input="edit.userEmail = $event.target.value"
                   />
                   <div
                     v-show="isPanelOpen.email"
