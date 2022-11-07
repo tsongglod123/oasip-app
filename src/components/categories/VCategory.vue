@@ -1,7 +1,9 @@
 <script setup>
+import { PencilSquareIcon, XCircleIcon } from "@heroicons/vue/20/solid";
 import TokenService from "@/services/token";
 import VEmptyList from "@/components/VEmptyList.vue";
-import { inject, ref } from "vue";
+import VModal from "@/components/categories/VModal.vue";
+import { inject, onBeforeMount, ref } from "vue";
 
 const CATEGORY_URL = import.meta.env.VITE_BASE_URL + "/v2/categories";
 
@@ -13,15 +15,161 @@ const showModal = ref(false);
 
 const toggleModal = (open) => (showModal.value = !open);
 
-// GET
-// DELETE
-// PATCH
+// GET [get categories]
+const getCategories = async () => {
+  if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
+    TokenService.clearTokens();
+    location.replace("/kp3/login");
+  } else if (TokenService.isTokenExpired(TokenService.getAccessToken())) {
+    await TokenService.refreshToken();
+  }
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: TokenService.getAccessToken(),
+    },
+  };
+  const res = await fetch(CATEGORY_URL, options);
+  if (res.status === 200) {
+    categories.value = await res.json();
+  } else {
+    const body = await res.json();
+    alert(body.message);
+  }
+};
+
+// GET [get category by id]
+const getCategory = async (id) => {
+  if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
+    TokenService.clearTokens();
+    location.replace("/kp3/login");
+  } else if (TokenService.isTokenExpired(TokenService.getAccessToken())) {
+    await TokenService.refreshToken();
+  }
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: TokenService.getAccessToken(),
+    },
+  };
+  const res = await fetch(CATEGORY_URL + "/" + id, options);
+  if (res.status === 200) {
+    category.value = await res.json();
+  } else {
+    const body = await res.json();
+    alert(body.message);
+  }
+};
+
+// DELETE [delete category by id]
+const deleteCategory = async (id) => {
+  if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
+    TokenService.clearTokens();
+    location.replace("/kp3/login");
+  } else if (TokenService.isTokenExpired(TokenService.getAccessToken())) {
+    await TokenService.refreshToken();
+  }
+  const text = "Are you sure you want to delete this category?";
+  if (confirm(text)) {
+    const options = {
+      method: "DELETE",
+      headers: {
+        Authorization: TokenService.getAccessToken(),
+      },
+    };
+    const res = await fetch(CATEGORY_URL + "/" + id, options);
+    if (res.status === 200) {
+      categories.value = categories.value.filter((c) => c.id !== id);
+    } else {
+      const body = await res.json();
+      alert(body.message);
+    }
+  }
+};
+
+// POST [create category]
+const createCategory = async (data) => {
+  if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
+    TokenService.clearTokens();
+    location.replace("/kp3/login");
+  } else if (TokenService.isTokenExpired(TokenService.getAccessToken())) {
+    await TokenService.refreshToken();
+  }
+  const options = {
+    method: "POST",
+    headers: {
+      Authorization: TokenService.getAccessToken(),
+      "Content-Type": json,
+    },
+    body: JSON.stringify(data),
+  };
+  const res = await fetch(CATEGORY_URL, options);
+  if (res.status === 201) {
+    const newCategory = await res.json();
+    alert("Add a new category successfully!");
+    categories.value.push(newCategory);
+  } else {
+    const body = await res.json();
+    alert(body.message);
+  }
+};
+
+// PATCH [update category by id]
+const updateCategory = async ([id, field, value]) => {
+  if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
+    TokenService.clearTokens();
+    location.replace("/kp3/login");
+  } else if (TokenService.isTokenExpired(TokenService.getAccessToken())) {
+    await TokenService.refreshToken();
+  }
+  const options = {
+    method: "PATCH",
+    headers: {
+      "Content-Type": json,
+      Authorization: TokenService.getAccessToken(),
+    },
+    body:
+      field === "eventDuration"
+        ? JSON.stringify({
+            [field]: parseInt(value),
+          })
+        : JSON.stringify({
+            [field]: value.trim(),
+          }),
+  };
+  const res = await fetch(CATEGORY_URL + "/" + id, options);
+  if (res.status === 200) {
+    category.value = await res.json();
+    categories.value = categories.value.map((c) =>
+      c.id === category.value.id ? category.value : c
+    );
+  } else {
+    const body = await res.json();
+    alert(body.message);
+  }
+};
+
+onBeforeMount(async () => {
+  if (!TokenService.checkLocalStorage()) {
+    isAuth.value = true;
+  } else {
+    isAuth.value = false;
+    await getCategories();
+  }
+});
 </script>
 
 <template>
-  <div v-show="0 > 0" id="category-list">
+  <div v-show="categories.length > 0" id="category-list">
     <div class="container p-2 mx-auto sm:p-4 text-gray-800">
-      <h2 class="mb-4 text-2xl font-semibold leading-tight">Categories</h2>
+      <h2 class="mb-4 text-2xl font-semibold leading-tight">
+        Categories
+        <button
+          class="float-right px-4 py-2 text-sm font-medium text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue"
+        >
+          Add Category
+        </button>
+      </h2>
       <div class="overflow-x-auto">
         <table class="min-w-full text-xs">
           <colgroup>
@@ -34,111 +182,66 @@ const toggleModal = (open) => (showModal.value = !open);
           <thead class="bg-gray-300">
             <tr class="text-left">
               <th class="p-3">#</th>
-              <th class="p-3">Client</th>
-              <th class="p-3">Issued</th>
-              <th class="p-3">Due</th>
-              <th class="p-3">Status</th>
+              <th class="p-3">Category</th>
+              <th class="p-3">Description</th>
+              <th class="p-3">Duration (minutes)</th>
+              <th class="p-3"></th>
             </tr>
           </thead>
           <tbody>
-            <tr class="border-b border-opacity-20 border-gray-300 bg-gray-50">
+            <tr
+              v-for="content in categories"
+              :key="content.id"
+              class="border-b border-opacity-20 border-gray-300 bg-gray-50"
+            >
               <td class="p-3">
-                <p>97412378923</p>
-              </td>
-              <td class="p-3">
-                <p>Microsoft Corporation</p>
-              </td>
-              <td class="p-3">
-                <p>14 Jan 2022</p>
-                <p class="text-gray-600">Friday</p>
+                <p>{{ content.id }}</p>
               </td>
               <td class="p-3">
-                <p>01 Feb 2022</p>
-                <p class="text-gray-600">Tuesday</p>
-              </td>
-              <td class="p-3 text-right">
-                <span
-                  class="px-3 py-1 font-semibold rounded-md bg-rose-600 text-gray-50"
-                >
-                  <span>Pending</span>
-                </span>
-              </td>
-            </tr>
-            <tr class="border-b border-opacity-20 border-gray-300 bg-gray-50">
-              <td class="p-3">
-                <p>97412378923</p>
+                <p>{{ content.categoryName }}</p>
               </td>
               <td class="p-3">
-                <p>Tesla Inc.</p>
+                <p>
+                  {{
+                    content.categoryDescription === null
+                      ? "No description"
+                      : content.categoryDescription
+                  }}
+                </p>
               </td>
               <td class="p-3">
-                <p>14 Jan 2022</p>
-                <p class="text-gray-600">Friday</p>
+                <p>{{ content.eventDuration }}</p>
               </td>
-              <td class="p-3">
-                <p>01 Feb 2022</p>
-                <p class="text-gray-600">Tuesday</p>
-              </td>
-              <td class="p-3 text-right">
-                <span
-                  class="px-3 py-1 font-semibold rounded-md bg-rose-600 text-gray-50"
-                >
-                  <span>Pending</span>
-                </span>
-              </td>
-            </tr>
-            <tr class="border-b border-opacity-20 border-gray-300 bg-gray-50">
-              <td class="p-3">
-                <p>97412378923</p>
-              </td>
-              <td class="p-3">
-                <p>Coca Cola co.</p>
-              </td>
-              <td class="p-3">
-                <p>14 Jan 2022</p>
-                <p class="text-gray-600">Friday</p>
-              </td>
-              <td class="p-3">
-                <p>01 Feb 2022</p>
-                <p class="text-gray-600">Tuesday</p>
-              </td>
-              <td class="p-3 text-right">
-                <span
-                  class="px-3 py-1 font-semibold rounded-md bg-rose-600 text-gray-50"
-                >
-                  <span>Pending</span>
-                </span>
-              </td>
-            </tr>
-            <tr class="border-b border-opacity-20 border-gray-300 bg-gray-50">
-              <td class="p-3">
-                <p>97412378923</p>
-              </td>
-              <td class="p-3">
-                <p>Nvidia Corporation</p>
-              </td>
-              <td class="p-3">
-                <p>14 Jan 2022</p>
-                <p class="text-gray-600">Friday</p>
-              </td>
-              <td class="p-3">
-                <p>01 Feb 2022</p>
-                <p class="text-gray-600">Tuesday</p>
-              </td>
-              <td class="p-3 text-right">
-                <span
-                  class="px-3 py-1 font-semibold rounded-md bg-rose-600 text-gray-50"
-                >
-                  <span>Pending</span>
-                </span>
+              <td class="p-2 text-right">
+                <button type="button" class="mr-2">
+                  <PencilSquareIcon
+                    class="w-5 h-5"
+                    @click.left="
+                      getCategory(content.id);
+                      toggleModal(showModal);
+                    "
+                  />
+                </button>
+                <button type="button">
+                  <XCircleIcon
+                    class="w-5 h-5 text-red-600"
+                    @click.left="deleteCategory(content.id)"
+                  />
+                </button>
               </td>
             </tr>
           </tbody>
         </table>
+        <VModal
+          :category="category"
+          :is-open="showModal"
+          @toggle="toggleModal"
+          @update="updateCategory"
+        />
       </div>
     </div>
   </div>
-  <div v-show="0 === 0 || isAuth">
+  <div v-show="categories.length === 0 || isAuth">
     <VEmptyList />
   </div>
 </template>

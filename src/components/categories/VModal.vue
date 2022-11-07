@@ -10,7 +10,7 @@ import { inject, ref } from "vue";
 
 const emit = defineEmits(["toggle", "update"]);
 const props = defineProps({
-  user: {
+  category: {
     type: Object,
     required: true,
   },
@@ -20,7 +20,6 @@ const props = defineProps({
 });
 
 const LENGTH = inject("length");
-const EMAIL_REGEX = inject("emailRegex");
 const css = {
   save: "inline-flex justify-center rounded-md border border-transparent bg-green-100 px-2 py-1 text-xs font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2",
   cancel:
@@ -33,14 +32,15 @@ const css = {
   },
 };
 
-const roles = ["student", "lecturer", "admin"];
 const isPanelOpen = ref({
-  username: false,
-  email: false,
+  category: false,
+  description: false,
+  duration: false,
 });
 const edit = ref({
-  userName: "",
-  userEmail: "",
+  categoryName: "",
+  categoryDescription: "",
+  eventDuration: 1,
 });
 
 const closeModal = () => {
@@ -53,7 +53,7 @@ const closeModal = () => {
   emit("toggle", true);
 };
 
-const updateUser = (id, field, val) => emit("update", [id, field, val]);
+const updateCategory = (id, field, val) => emit("update", [id, field, val]);
 
 const togglePanel = (field) => {
   for (const key in edit.value) {
@@ -62,7 +62,7 @@ const togglePanel = (field) => {
   isPanelOpen.value[field] = !isPanelOpen.value[field];
 };
 
-const setDefault = (field) => (edit.value[field] = props.user[field]);
+const setDefault = (field) => (edit.value[field] = props.category[field]);
 </script>
 
 <template>
@@ -99,45 +99,49 @@ const setDefault = (field) => (edit.value[field] = props.user[field]);
                 as="h3"
                 class="text-lg font-medium leading-6 text-gray-900"
               >
-                User Information
+                Category Information
               </DialogTitle>
               <div class="mt-2">
                 <div>
                   <label
-                    for="username"
+                    for="category"
                     class="block mb-2 text-sm font-medium text-gray-900"
-                    >Username
+                    >Category
                     <button
                       type="button"
                       class="text-sm text-blue-500 hover:text-blue-700"
-                      @click.left="togglePanel('username')"
+                      @click.left="togglePanel('category')"
                     >
                       edit
                     </button>
                   </label>
                   <input
-                    id="username"
-                    :value="user.userName"
+                    id="category"
+                    :value="category.categoryName"
                     type="text"
                     :maxlength="LENGTH.username"
                     :class="
-                      isPanelOpen.username
+                      isPanelOpen.category
                         ? css.input.enabled
                         : css.input.disabled
                     "
-                    :disabled="!isPanelOpen.username"
-                    @input="edit.userName = $event.target.value"
+                    :disabled="!isPanelOpen.category"
+                    @input="edit.categoryName = $event.target.value"
                   />
                   <div
-                    v-show="isPanelOpen.username"
+                    v-show="isPanelOpen.category"
                     class="mt-1 flex flex-row-reverse"
                   >
                     <button
                       type="button"
                       :class="css.save"
                       @click.left="
-                        updateUser(user.id, 'userName', edit.userName);
-                        togglePanel('username');
+                        updateCategory(
+                          category.id,
+                          'categoryName',
+                          edit.categoryName
+                        );
+                        togglePanel('category');
                       "
                     >
                       Save
@@ -145,7 +149,7 @@ const setDefault = (field) => (edit.value[field] = props.user[field]);
                     <button
                       type="button"
                       :class="css.cancel"
-                      @click.left="togglePanel('username')"
+                      @click.left="togglePanel('category')"
                     >
                       Cancel
                     </button>
@@ -153,39 +157,99 @@ const setDefault = (field) => (edit.value[field] = props.user[field]);
                 </div>
                 <div>
                   <label
-                    for="email"
+                    for="description"
                     class="block mb-2 text-sm font-medium text-gray-900"
-                    >Email
+                    >Description
                     <button
                       type="button"
                       class="text-sm text-blue-500 hover:text-blue-700"
-                      @click.left="togglePanel('email')"
+                      @click.left="togglePanel('description')"
+                    >
+                      edit
+                    </button>
+                  </label>
+                  <textarea
+                    id="description"
+                    placeholder="Enter a description"
+                    :value="category.categoryDescription"
+                    :maxlength="LENGTH.email"
+                    :class="
+                      isPanelOpen.description
+                        ? css.input.enabled
+                        : css.input.disabled
+                    "
+                    :disabled="!isPanelOpen.description"
+                    @input="edit.categoryDescription = $event.target.value"
+                  />
+                  <div
+                    v-show="isPanelOpen.description"
+                    class="mt-1 flex flex-row-reverse"
+                  >
+                    <button
+                      type="button"
+                      :class="css.save"
+                      @click.left="
+                        updateCategory(
+                          category.id,
+                          'categoryDescription',
+                          edit.categoryDescription
+                        );
+                        togglePanel('description');
+                      "
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      :class="css.cancel"
+                      @click.left="togglePanel('description')"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label
+                    for="duration"
+                    class="block mb-2 text-sm font-medium text-gray-900"
+                    >Duration (minutes)
+                    <button
+                      type="button"
+                      class="text-sm text-blue-500 hover:text-blue-700"
+                      @click.left="togglePanel('duration')"
                     >
                       edit
                     </button>
                   </label>
                   <input
-                    id="email"
-                    :value="user.userEmail"
-                    type="email"
-                    :maxlength="LENGTH.email"
+                    id="duration"
+                    :value="category.eventDuration"
+                    type="number"
+                    :min="LENGTH.duration.min"
+                    :max="LENGTH.duration.max"
+                    step="1"
                     :class="
-                      isPanelOpen.email ? css.input.enabled : css.input.disabled
+                      isPanelOpen.duration
+                        ? css.input.enabled
+                        : css.input.disabled
                     "
-                    :pattern="EMAIL_REGEX"
-                    :disabled="!isPanelOpen.email"
-                    @input="edit.userEmail = $event.target.value"
+                    :disabled="!isPanelOpen.duration"
+                    @input="edit.eventDuration = $event.target.value"
                   />
                   <div
-                    v-show="isPanelOpen.email"
+                    v-show="isPanelOpen.duration"
                     class="mt-1 flex flex-row-reverse"
                   >
                     <button
                       type="button"
                       :class="css.save"
                       @click.left="
-                        updateUser(user.id, 'userEmail', edit.userEmail);
-                        togglePanel('email');
+                        updateCategory(
+                          category.id,
+                          'eventDuration',
+                          edit.eventDuration
+                        );
+                        togglePanel('duration');
                       "
                     >
                       Save
@@ -193,64 +257,11 @@ const setDefault = (field) => (edit.value[field] = props.user[field]);
                     <button
                       type="button"
                       :class="css.cancel"
-                      @click.left="togglePanel('email')"
+                      @click.left="togglePanel('duration')"
                     >
                       Cancel
                     </button>
                   </div>
-                </div>
-                <div>
-                  <label
-                    for="role"
-                    class="block mb-2 text-sm font-medium text-gray-900"
-                    >Role</label
-                  >
-                  <select
-                    id="role"
-                    :value="user.role"
-                    :class="css.input.enabled"
-                    required
-                    @input="
-                      updateUser(user.id, 'userRole', $event.target.value)
-                    "
-                  >
-                    <option disabled value="">Please select a role</option>
-                    <option
-                      v-for="(role, index) in roles"
-                      :key="index"
-                      :value="role"
-                    >
-                      {{ role }}
-                    </option>
-                  </select>
-                </div>
-                <div>
-                  <dl>
-                    <div
-                      class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                    >
-                      <dt class="text-sm font-medium text-gray-500">
-                        Create on
-                      </dt>
-                      <dd
-                        class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
-                      >
-                        {{ user.createdDate + " at " + user.createdTime }}
-                      </dd>
-                    </div>
-                    <div
-                      class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                    >
-                      <dt class="text-sm font-medium text-gray-500">
-                        Last update
-                      </dt>
-                      <dd
-                        class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
-                      >
-                        {{ user.updatedDate + " at " + user.updatedTime }}
-                      </dd>
-                    </div>
-                  </dl>
                 </div>
               </div>
               <div class="mt-4 flex flex-row-reverse">

@@ -8,6 +8,10 @@ const app = createApp(App);
 app.provide("isEmailValid", (email, regex) => email.toLowerCase().match(regex));
 app.provide("router", (link) => router.push({ name: link }));
 app.provide("length", {
+  duration: {
+    min: 1,
+    max: 480,
+  },
   notes: 500,
   email: 50,
   username: 100,
