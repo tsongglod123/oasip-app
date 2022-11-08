@@ -16,7 +16,6 @@ const showModal = ref(false);
 const showFormModal = ref(false);
 
 const toggleModal = (open) => (showModal.value = !open);
-
 const toggleFormModal = (open) => (showFormModal.value = !open);
 
 // GET [get categories]
@@ -91,11 +90,6 @@ const deleteCategory = async (id) => {
   }
 };
 
-const isAllowToSubmit = (category) => {
-  const { categoryName, eventDuration } = category;
-  return categoryName.length > 0 && eventDuration >= 1 && eventDuration <= 480;
-};
-
 // POST [create category]
 const createCategory = async (data) => {
   if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
@@ -104,24 +98,22 @@ const createCategory = async (data) => {
   } else if (TokenService.isTokenExpired(TokenService.getAccessToken())) {
     await TokenService.refreshToken();
   }
-  if (isAllowToSubmit(data)) {
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": json,
-        Authorization: TokenService.getAccessToken(),
-      },
-      body: JSON.stringify(data),
-    };
-    const res = await fetch(CATEGORY_URL, options);
-    if (res.status === 201) {
-      const newCategory = await res.json();
-      alert("Add a new category successfully!");
-      categories.value.push(newCategory);
-    } else {
-      const body = await res.json();
-      alert(body.message);
-    }
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": json,
+      Authorization: TokenService.getAccessToken(),
+    },
+    body: JSON.stringify(data),
+  };
+  const res = await fetch(CATEGORY_URL, options);
+  if (res.status === 201) {
+    const newCategory = await res.json();
+    alert("Add a new category successfully!");
+    categories.value.push(newCategory);
+  } else {
+    const body = await res.json();
+    alert(body.message);
   }
 };
 

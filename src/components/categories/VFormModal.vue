@@ -93,7 +93,7 @@ const isAllowToSubmit = (category) => {
                 as="h3"
                 class="text-lg font-medium leading-6 text-gray-900"
               >
-                New Category
+                Create a new category
               </DialogTitle>
               <form @submit.prevent>
                 <div class="mt-2">
