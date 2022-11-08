@@ -16,6 +16,7 @@ defineProps({
 });
 
 const category = ref({
+  id: 0,
   categoryName: "",
   categoryDescription: "",
   eventDuration: 0,
@@ -35,6 +36,7 @@ const css = {
 
 const resetForm = () => {
   category.value = {
+    id: 0,
     categoryName: "",
     categoryDescription: "",
     eventDuration: 0,
@@ -54,8 +56,13 @@ const createCategory = (val) => {
 };
 
 const isAllowToSubmit = (category) => {
-  const { categoryName, eventDuration } = category;
-  return categoryName.length > 0 && eventDuration >= 1 && eventDuration <= 480;
+  const { id, categoryName, eventDuration } = category;
+  return (
+    id >= 1 &&
+    categoryName.length > 0 &&
+    eventDuration >= 1 &&
+    eventDuration <= 480
+  );
 };
 </script>
 
@@ -97,6 +104,22 @@ const isAllowToSubmit = (category) => {
               </DialogTitle>
               <form @submit.prevent>
                 <div class="mt-2">
+                  <div>
+                    <label
+                      for="category-id"
+                      class="block mb-2 text-sm font-medium text-gray-900"
+                      >ID
+                    </label>
+                    <input
+                      id="category-id"
+                      v-model="category.id"
+                      type="number"
+                      minlength="1"
+                      step="1"
+                      :class="css.input.enabled"
+                      required
+                    />
+                  </div>
                   <div>
                     <label
                       for="category"
