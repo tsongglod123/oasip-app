@@ -22,9 +22,9 @@ const category = ref({
 });
 const LENGTH = inject("length");
 const css = {
-  save: "inline-flex justify-center rounded-md border border-transparent bg-green-100 px-2 py-1 text-xs font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2",
+  save: "inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
   cancel:
-    "inline-flex justify-center rounded-md border border-transparent px-2 py-1 text-xs font-medium text-gray-400 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+    "inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-gray-400 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
   input: {
     disabled:
       "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500",
@@ -148,14 +148,14 @@ const isAllowToSubmit = (category) => {
                 <div class="mt-4 flex flex-row-reverse">
                   <button
                     type="submit"
-                    class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    :class="css.save"
                     @click.left="createCategory(category)"
                   >
                     Create
                   </button>
                   <button
                     type="button"
-                    class="inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-gray-400 hover:text-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                    :class="css.cancel"
                     @click.left="closeModal"
                   >
                     Cancel
