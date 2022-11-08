@@ -93,7 +93,7 @@ const deleteCategory = async (id) => {
 
 const isAllowToSubmit = (category) => {
   const { categoryName, eventDuration } = category;
-  return categoryName.length > 0 && eventDuration > 0 && eventDuration <= 480;
+  return categoryName.length > 0 && eventDuration >= 1 && eventDuration <= 480;
 };
 
 // POST [create category]
