@@ -104,7 +104,7 @@ const register = async (data) => {
               type="text"
               :maxlength="LENGTH.username"
               class="relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              placeholder="Username"
+              placeholder="Enter an username"
               required
             />
           </div>
@@ -116,7 +116,7 @@ const register = async (data) => {
               type="email"
               :maxlength="LENGTH.email"
               class="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              placeholder="Email address"
+              placeholder="Enter an email address"
               :pattern="EMAIL_REGEX"
               required
             />
@@ -130,7 +130,7 @@ const register = async (data) => {
               :minlength="LENGTH.password.min"
               :maxlength="LENGTH.password.max"
               class="relative block w-full appearance-none rounded-none border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              placeholder="Password"
+              placeholder="Enter a password"
               required
             />
           </div>
