@@ -150,12 +150,8 @@ const updateCategory = async ([id, field, value]) => {
 };
 
 onBeforeMount(async () => {
-  if (!TokenService.checkLocalStorage()) {
-    isAuth.value = true;
-  } else {
-    isAuth.value = false;
-    await getCategories();
-  }
+  isAuth.value = TokenService.checkLocalStorage() ? true : false;
+  await getCategories();
 });
 </script>
 
@@ -241,7 +237,7 @@ onBeforeMount(async () => {
       </div>
     </div>
   </div>
-  <div v-show="categories.length === 0 || isAuth">
+  <div v-show="categories.length === 0">
     <VEmptyList />
   </div>
 </template>
