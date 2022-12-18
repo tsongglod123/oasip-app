@@ -197,7 +197,7 @@ const deleteUser = async (id) => {
       },
     };
     const res = await fetch(USER_URL + "/" + id, options);
-    if (res.status === 200) {
+    if (res.status === 204) {
       users.value.content = users.value.content.filter((u) => u.id !== id);
     } else {
       const body = await res.json();
@@ -207,17 +207,17 @@ const deleteUser = async (id) => {
 };
 
 onBeforeMount(async () => {
-  if (!TokenService.checkLocalStorage()) {
+  if (TokenService.checkLocalStorage() && TokenService.getRole() === "admin") {
     isAuth.value = true;
+    await getUsers();
   } else {
     isAuth.value = false;
-    await getUsers();
   }
 });
 </script>
 
 <template>
-  <div v-show="users.totalElements > 0" id="user-list">
+  <div v-if="isAuth && users.totalElements > 0" id="user-list">
     <div class="container p-2 mx-auto sm:p-4 text-gray-800">
       <h2 class="mb-4 text-2xl font-semibold leading-tight">Users</h2>
       <div class="overflow-x-auto">
@@ -312,7 +312,7 @@ onBeforeMount(async () => {
       </button>
     </div>
   </div>
-  <div v-show="users.totalElements === 0 || isAuth">
+  <div v-else>
     <VEmptyList />
   </div>
 </template>

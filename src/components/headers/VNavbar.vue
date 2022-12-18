@@ -105,7 +105,7 @@ const logout = () => {
                     >Sign up
                   </a>
                 </MenuItem>
-                <MenuItem v-if="checkLocalStorage" v-slot="{ active }">
+                <MenuItem v-else v-slot="{ active }">
                   <a
                     :class="[
                       active ? 'bg-gray-100' : '',

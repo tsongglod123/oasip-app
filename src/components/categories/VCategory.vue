@@ -20,17 +20,8 @@ const toggleFormModal = (open) => (showFormModal.value = !open);
 
 // GET [get categories]
 const getCategories = async () => {
-  if (TokenService.isTokenExpired(TokenService.getRefreshToken())) {
-    TokenService.clearTokens();
-    location.replace("/kp3/login");
-  } else if (TokenService.isTokenExpired(TokenService.getAccessToken())) {
-    await TokenService.refreshToken();
-  }
   const options = {
     method: "GET",
-    headers: {
-      Authorization: TokenService.getAccessToken(),
-    },
   };
   const res = await fetch(CATEGORY_URL, options);
   if (res.status === 200) {
@@ -81,7 +72,7 @@ const deleteCategory = async (id) => {
       },
     };
     const res = await fetch(CATEGORY_URL + "/" + id, options);
-    if (res.status === 200) {
+    if (res.status === 204) {
       categories.value = categories.value.filter((c) => c.id !== id);
     } else {
       const body = await res.json();
@@ -159,11 +150,12 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div v-show="categories.length > 0" id="category-list">
+  <div v-if="categories.length > 0" id="category-list">
     <div class="container p-2 mx-auto sm:p-4 text-gray-800">
       <h2 class="mb-4 text-2xl font-semibold leading-tight">
         Categories
         <button
+          v-show="isAuth && TokenService.getRole() === 'admin'"
           class="float-right px-4 py-2 text-sm font-medium text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue"
           @click.left="toggleFormModal(showFormModal)"
         >
@@ -218,7 +210,11 @@ onBeforeMount(async () => {
                 <p>{{ content.eventDuration }}</p>
               </td>
               <td class="p-2 text-right">
-                <button type="button" class="mr-2">
+                <button
+                  v-show="isAuth && TokenService.getRole() === 'admin'"
+                  type="button"
+                  class="mr-2"
+                >
                   <PencilSquareIcon
                     class="w-5 h-5"
                     @click.left="
@@ -227,7 +223,10 @@ onBeforeMount(async () => {
                     "
                   />
                 </button>
-                <button type="button">
+                <button
+                  v-show="isAuth && TokenService.getRole() === 'admin'"
+                  type="button"
+                >
                   <XCircleIcon
                     class="w-5 h-5 text-red-600"
                     @click.left="deleteCategory(content.id)"
@@ -246,7 +245,7 @@ onBeforeMount(async () => {
       </div>
     </div>
   </div>
-  <div v-show="categories.length === 0">
+  <div v-else>
     <VEmptyList />
   </div>
 </template>
