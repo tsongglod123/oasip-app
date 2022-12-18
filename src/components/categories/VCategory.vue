@@ -4,6 +4,7 @@ import TokenService from "@/services/token";
 import VEmptyList from "@/components/VEmptyList.vue";
 import VModal from "@/components/categories/VModal.vue";
 import { inject, onBeforeMount, ref } from "vue";
+import VFormModal from "@/components/categories/VFormModal.vue";
 
 const CATEGORY_URL = import.meta.env.VITE_BASE_URL + "/v2/categories";
 
@@ -12,8 +13,10 @@ const category = ref({});
 const json = inject("json");
 const isAuth = ref(false);
 const showModal = ref(false);
+const showFormModal = ref(false);
 
 const toggleModal = (open) => (showModal.value = !open);
+const toggleFormModal = (open) => (showFormModal.value = !open);
 
 // GET [get categories]
 const getCategories = async () => {
@@ -98,8 +101,8 @@ const createCategory = async (data) => {
   const options = {
     method: "POST",
     headers: {
-      Authorization: TokenService.getAccessToken(),
       "Content-Type": json,
+      Authorization: TokenService.getAccessToken(),
     },
     body: JSON.stringify(data),
   };
@@ -162,10 +165,16 @@ onBeforeMount(async () => {
         Categories
         <button
           class="float-right px-4 py-2 text-sm font-medium text-white transition-colors duration-150 bg-blue-600 border border-transparent rounded-lg active:bg-blue-600 hover:bg-blue-700 focus:outline-none focus:shadow-outline-blue"
+          @click.left="toggleFormModal(showFormModal)"
         >
           Add Category
         </button>
       </h2>
+      <VFormModal
+        :is-open="showFormModal"
+        @toggle="toggleFormModal"
+        @create="createCategory"
+      />
       <div class="overflow-x-auto">
         <table class="min-w-full text-xs">
           <colgroup>
